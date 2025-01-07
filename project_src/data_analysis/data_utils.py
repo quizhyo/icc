@@ -32,7 +32,7 @@ def introduction_message():
 # Show developer info at the bottom
 def developer_info():
     time.sleep(2)
-    st.write(stream_data(":grey[Streamline Analyst is developed by *TN. You can reach out to me via] :blue[w@gmail.com] :grey[or] :blue[[GitHub](https://githuon)]"))
+    st.write(stream_data(":grey[AI Agent is developed by *TN. You can reach out to us via] :rd[w@intersnack.com.sg] :grey[or]"))
 
 def developer_info_static():
-    st.write(":grey[Streamline Analyst is developed by *TN*. You can reach out to me via] :blue[@gmail.com] :grey[or] :blue[[GitHub](https://github.co)]")
+    st.write(":grey[AI Agent is developed by *TN*. You can reach out to us via] :rd[@intersnack.com.sg] :grey[or]")

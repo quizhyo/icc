@@ -6,7 +6,8 @@ from datetime import datetime
 from streamlit_lottie import st_lottie
 from dotenv import load_dotenv
 from langchain.agents import AgentType
-from langchain.chat_models import ChatOpenAI
+from langchain_community.chat_models import ChatOpenAI
+from PIL import Image
 
 # Import data analysis components
 from project_src.utils.session import init_session_state, validate_api_keys, init_qdrant
@@ -29,11 +30,14 @@ from project_src.data_analysis_v1.visualizer import display_data_preview, create
 load_dotenv()
 API_KEY = os.getenv('OPENAI_API_KEY')
 
+im = Image.open("images/only_logo.png")
+# Set up the Streamlit page configuration
+
 # Set up the Streamlit page configuration
 st.set_page_config(
     layout="wide",
-    page_title="AI-Powered Analysis",
-    page_icon="🎓",
+    page_title="ICC AI Agent - R&D Project",
+    page_icon=im,
     initial_sidebar_state="expanded"
 )
 
@@ -213,11 +217,11 @@ def display_home_page():
         st.session_state.welcome_message = welcome_message()
         st.write(stream_data(st.session_state.welcome_message))
         time.sleep(0.5)
-        st.write("[Learn more about our features >](https://github.com/yourusername/yourrepo)")
+        st.write("[Learn more about our features >](hung.dang@intersnack.com.vn)")
         st.session_state.initialized = False
     else:
         st.write(st.session_state.welcome_message)
-        st.write("[Learn more about our features >](https://github.com/yourusername/yourrepo)")
+        st.write("[Learn more about our features >](hung.dang@intersnack.com.vn)")
 
     # Introduction section
     st.divider()
@@ -241,17 +245,34 @@ def display_home_page():
         st.header("Simple to Use")
         st.write(introduction_message()[1])
 
-def add_to_history(entry_type: str, file_name: str, analysis_type: str = None, 
-                  query: str = None, response: str = None):
-    """Add an entry to the analysis history"""
+def add_to_history(
+    entry_type: str = "Data Analysis",
+    filename: str = None,
+    file_name: str = None,  # For backwards compatibility
+    file_type: str = None,
+    model: str = None,
+    analysis_type: str = None,
+    query: str = None,
+    response: str = None
+) -> None:
+    """Add entry to analysis history"""
+    if 'history' not in st.session_state:
+        st.session_state.history = []
+        
     entry = {
         'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         'type': entry_type,
-        'file': file_name,
+        'file': filename or file_name,  # Use either filename or file_name
+        'file_type': file_type,
+        'model': model,
         'analysis_type': analysis_type,
         'query': query,
         'response': response
     }
+    
+    # Remove None values from the entry
+    entry = {k: v for k, v in entry.items() if v is not None}
+    
     st.session_state.history.append(entry)
 
 def display_data_analysis():
@@ -327,21 +348,26 @@ def display_data_analysis():
                         if hasattr(st.session_state, 'uploaded_filename'):
                             add_to_history(
                                 entry_type="Data Analysis",
-                                file_name=st.session_state.uploaded_filename,
+                                filename=st.session_state.uploaded_filename,
+                                model=SELECTED_MODEL,
                                 analysis_type=MODE
                             )
-                        
-                        # Perform the selected analysis with API_KEY from env
-                        if MODE == 'Predictive Classification': prediction_model_pipeline(st.session_state.DF_uploaded, API_KEY, GPT_MODEL)
-                        elif MODE == 'Clustering Model': cluster_model_pipeline(st.session_state.DF_uploaded, API_KEY, GPT_MODEL)
-                        elif MODE == 'Regression Model': regression_model_pipeline(st.session_state.DF_uploaded, API_KEY, GPT_MODEL)
-                        else:  # Data Visualization
-                            results = data_visualization(st.session_state.DF_uploaded)
-                            
-                        st.success("Analysis completed!")
-                        
+
+                        try:
+                            if MODE == "Predictive Classification":
+                                prediction_model_pipeline(st.session_state.DF_uploaded, API_KEY, GPT_MODEL)
+                            elif MODE == "Clustering Model":
+                                cluster_model_pipeline(st.session_state.DF_uploaded, API_KEY, GPT_MODEL) 
+                            elif MODE == "Regression Model":
+                                regression_model_pipeline(st.session_state.DF_uploaded, API_KEY, GPT_MODEL)
+                            elif MODE == "Data Visualization":
+                                data_visualization(st.session_state.DF_uploaded, API_KEY, GPT_MODEL)
+                        except Exception as e:
+                            st.error(f"Error during analysis: {str(e)}")
+                        except Exception as e:
+                            st.error(f"Error during analysis: {str(e)}")
                     except Exception as e:
-                        st.error(f"Error during analysis: {str(e)}")
+                            st.error(f"Error during analysis: {str(e)}")
 
 def main():
     """Main application function"""
