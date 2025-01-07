@@ -96,7 +96,7 @@ portalocker==2.10.1
 primp==0.9.3
 prompt_toolkit==3.0.48
 propcache==0.2.1
-protobuf==4.25.5
+protobuf==4.25.3
 psutil==6.1.1
 psygnal==0.11.1
 pure_eval==0.2.3
