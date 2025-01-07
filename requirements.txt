@@ -50,7 +50,7 @@ watchdog==6.0.0
 
 imbalanced_learn==0.12.0
 
-langchain==0.1.6
+langchain>=0.1.6
 matplotlib==3.7.2
 
 
